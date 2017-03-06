@@ -1,6 +1,7 @@
 package uk.gov.ida.dropwizard.logstash;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.dropwizard.testing.ConfigOverride;
 import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit.DropwizardAppRule;
 import org.glassfish.jersey.client.JerseyClientBuilder;
@@ -20,31 +21,32 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 public class LogstashFileAppenderAppRuleTest {
 
-    private static final String LOGSTASH_FILE_REQUESTS_LOG = "./build/logstash-file-requests.log";
-    private static final String LOGSTASH_FILE_LOG_LOG = "./build/logstash-file-log.log";
     private static File requestLog;
     private static File logLog;
 
     // this is executed before the @ClassRule
     static {
-        requestLog = new File(LOGSTASH_FILE_REQUESTS_LOG);
-        logLog = new File(LOGSTASH_FILE_LOG_LOG);
-        // delete the files
-        requestLog.delete();
-        logLog.delete();
+        try {
+            requestLog = File.createTempFile("request-log-",".log");
+            requestLog.deleteOnExit();
+            logLog = File.createTempFile("log-log-",".log");
+            logLog.deleteOnExit();
+        } catch (IOException e) {
+            fail("can't create temp log files");
+            e.printStackTrace();
+        }
     }
 
     @ClassRule
-    public static DropwizardAppRule<TestConfiguration> dropwizardAppRule = new DropwizardAppRule(TestApplication.class, ResourceHelpers.resourceFilePath("test-application.yml"));
-
-    @Before
-    public void before() {
-        assertThat(requestLog.exists()).isTrue();
-        assertThat(logLog.exists()).isTrue();
-    }
+    public static DropwizardAppRule<TestConfiguration> dropwizardAppRule = new DropwizardAppRule(TestApplication.class, ResourceHelpers
+            .resourceFilePath("file-appender-test-application.yml"),
+            ConfigOverride.config("server.requestLog.appenders[0].currentLogFilename", requestLog.getAbsolutePath()),
+            ConfigOverride.config("logging.appenders[0].currentLogFilename", logLog.getAbsolutePath())
+            );
 
     @Test
     public void testLoggingLogstashRequestLog() throws InterruptedException, IOException {
