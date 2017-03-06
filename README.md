@@ -4,7 +4,7 @@ Dropwizard extension that supports logstash format with various appenders: `logs
 
 ## Using the library
 
-* Build and install to your local repository: `gradle publishToMavenLocal`
+* Build and install to your local repository: `./gradlew publishToMavenLocal`
 * Add the dependency to your project: `uk.gov.ida:dropwizard-logstash:1.0.5-SNAPSHOT`
 * Add the bundle to your app: `bootstrap.addBundle(new LogstashBundle())`
 * Configure the logger in the application config file by using `logstash-file`, `logstash-syslog`, or `logstash-console`: 
