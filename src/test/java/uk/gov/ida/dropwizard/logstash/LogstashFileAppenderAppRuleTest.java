@@ -5,6 +5,7 @@ import io.dropwizard.testing.ConfigOverride;
 import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit.DropwizardAppRule;
 import org.glassfish.jersey.client.JerseyClientBuilder;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -32,9 +33,7 @@ public class LogstashFileAppenderAppRuleTest {
     static {
         try {
             requestLog = File.createTempFile("request-log-",".log");
-            requestLog.deleteOnExit();
             logLog = File.createTempFile("log-log-",".log");
-            logLog.deleteOnExit();
         } catch (IOException e) {
             fail("can't create temp log files");
             e.printStackTrace();
@@ -47,6 +46,12 @@ public class LogstashFileAppenderAppRuleTest {
             ConfigOverride.config("server.requestLog.appenders[0].currentLogFilename", requestLog.getAbsolutePath()),
             ConfigOverride.config("logging.appenders[0].currentLogFilename", logLog.getAbsolutePath())
             );
+
+    @AfterClass
+    public static void after() {
+        requestLog.delete();
+        logLog.delete();
+    }
 
     @Test
     public void testLoggingLogstashRequestLog() throws InterruptedException, IOException {
@@ -70,6 +75,8 @@ public class LogstashFileAppenderAppRuleTest {
 
     @Test
     public void testLoggingLogstashFileLog() throws IOException {
+
+        assertThat(logLog.length()).isGreaterThan(0);
 
         final List<LogFormat> list = parseLog(logLog);
 
