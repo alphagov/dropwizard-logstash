@@ -34,16 +34,7 @@ public class LogstashFileAppenderAppRuleTest {
         try {
             requestLog = File.createTempFile("request-log-",".log");
             logLog = File.createTempFile("log-log-",".log");
-            // travis is slow, check the file exists
-            int count = 0;
-            while(count<5 && (!requestLog.exists() || !logLog.exists())) {
-                count++;
-                Thread.sleep(100);
-            }
-            if(!requestLog.exists() || !logLog.exists()) {
-                fail("temp files were not created");
-            }
-        } catch (InterruptedException|IOException e) {
+        } catch (IOException e) {
             fail("can't create temp log files");
             e.printStackTrace();
         }
@@ -69,6 +60,13 @@ public class LogstashFileAppenderAppRuleTest {
         final Response response = client.target("http://localhost:" + dropwizardAppRule.getLocalPort() + "/").request().get();
 
         assertThat(response.readEntity(String.class)).isEqualTo("hello!");
+
+        // wait for the logs to be written
+        int count = 0;
+        while(count<5 && (requestLog.length() == 0)) {
+            count++;
+            Thread.sleep(count*50);
+        }
 
         assertThat(requestLog.length()).isGreaterThan(0);
 
