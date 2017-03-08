@@ -34,7 +34,16 @@ public class LogstashFileAppenderAppRuleTest {
         try {
             requestLog = File.createTempFile("request-log-",".log");
             logLog = File.createTempFile("log-log-",".log");
-        } catch (IOException e) {
+            // travis is slow, check the file exists
+            int count = 0;
+            while(count<5 && (!requestLog.exists() || !logLog.exists())) {
+                count++;
+                Thread.sleep(100);
+            }
+            if(!requestLog.exists() || !logLog.exists()) {
+                fail("temp files were not created");
+            }
+        } catch (InterruptedException|IOException e) {
             fail("can't create temp log files");
             e.printStackTrace();
         }
