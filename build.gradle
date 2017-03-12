@@ -33,13 +33,11 @@ publishing {
                 classifier "sources"
             }
         }
-
-        repositories {
-            maven {
-                url "file:/srv/maven" // change to point to your repo, e.g. http://my.org/repo
-            }
+    }
+    repositories {
+        maven {
+            url "file:/srv/maven" // change to point to your repo, e.g. http://my.org/repo
         }
-
     }
 }
 
@@ -58,7 +56,7 @@ publishing {
     }
 
     task wrapper(type: Wrapper) {
-        gradleVersion = '1.11'
+        gradleVersion = '3.4.1'
     }
 
 task sourceJar(type: Jar) {
