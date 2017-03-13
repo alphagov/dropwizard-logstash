@@ -50,7 +50,7 @@ bintray {
   publications = ['mavenJava']
   publish = true
 	pkg {
-		repo = 'maven-test'
+		repo = 'maven'
 		name = 'dropwizard-logstash'
 		userOrg = 'alphagov'
     licenses = ['MIT']
