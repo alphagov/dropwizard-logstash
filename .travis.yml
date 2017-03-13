@@ -2,7 +2,7 @@ language: java
 jdk:
 - oraclejdk8
 after_success:
-- test "${TRAVIS_PULL_REQUEST}" == "false" && test "${TRAVIS_TAG}" != "" && BUILD_NUMBER=$TRAVIS_TAG
+- test "$TRAVIS_PULL_REQUEST" == false && test -n "$TRAVIS_TAG" && BUILD_NUMBER=$TRAVIS_TAG
   ./gradlew bintrayUpload
 env:
   global:
