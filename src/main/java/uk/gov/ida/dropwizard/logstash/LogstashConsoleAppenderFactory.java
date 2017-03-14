@@ -25,6 +25,7 @@ public class LogstashConsoleAppenderFactory extends ConsoleAppenderFactory {
 
         Encoder<ILoggingEvent> encoder = new LogstashEncoder();
         encoder.setContext(context);
+        encoder.start();
 
         final ConsoleAppender<ILoggingEvent> appender = new ConsoleAppender<>();
         appender.setName("logstash-console-appender");
