@@ -1,9 +1,11 @@
 package uk.gov.ida.dropwizard.logstash;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.dropwizard.testing.ConfigOverride;
 import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit.DropwizardAppRule;
 import org.glassfish.jersey.client.JerseyClientBuilder;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -20,30 +22,35 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 public class LogstashFileAppenderAppRuleTest {
 
-    private static final String LOGSTASH_FILE_REQUESTS_LOG = "./build/logstash-file-requests.log";
-    private static final String LOGSTASH_FILE_LOG_LOG = "./build/logstash-file-log.log";
     private static File requestLog;
     private static File logLog;
 
     // this is executed before the @ClassRule
     static {
-        requestLog = new File(LOGSTASH_FILE_REQUESTS_LOG);
-        logLog = new File(LOGSTASH_FILE_LOG_LOG);
-        // delete the files
-        requestLog.delete();
-        logLog.delete();
+        try {
+            requestLog = File.createTempFile("request-log-",".log");
+            logLog = File.createTempFile("log-log-",".log");
+        } catch (IOException e) {
+            fail("can't create temp log files");
+            e.printStackTrace();
+        }
     }
 
     @ClassRule
-    public static DropwizardAppRule<TestConfiguration> dropwizardAppRule = new DropwizardAppRule(TestApplication.class, ResourceHelpers.resourceFilePath("test-application.yml"));
+    public static DropwizardAppRule<TestConfiguration> dropwizardAppRule = new DropwizardAppRule(TestApplication.class, ResourceHelpers
+            .resourceFilePath("file-appender-test-application.yml"),
+            ConfigOverride.config("server.requestLog.appenders[0].currentLogFilename", requestLog.getAbsolutePath()),
+            ConfigOverride.config("logging.appenders[0].currentLogFilename", logLog.getAbsolutePath())
+            );
 
-    @Before
-    public void before() {
-        assertThat(requestLog.exists()).isTrue();
-        assertThat(logLog.exists()).isTrue();
+    @AfterClass
+    public static void after() {
+        requestLog.delete();
+        logLog.delete();
     }
 
     @Test
@@ -53,6 +60,13 @@ public class LogstashFileAppenderAppRuleTest {
         final Response response = client.target("http://localhost:" + dropwizardAppRule.getLocalPort() + "/").request().get();
 
         assertThat(response.readEntity(String.class)).isEqualTo("hello!");
+
+        // wait for the logs to be written
+        int count = 0;
+        while(count<5 && (requestLog.length() == 0)) {
+            count++;
+            Thread.sleep(count*50);
+        }
 
         assertThat(requestLog.length()).isGreaterThan(0);
 
@@ -68,6 +82,8 @@ public class LogstashFileAppenderAppRuleTest {
 
     @Test
     public void testLoggingLogstashFileLog() throws IOException {
+
+        assertThat(logLog.length()).isGreaterThan(0);
 
         final List<LogFormat> list = parseLog(logLog);
 
