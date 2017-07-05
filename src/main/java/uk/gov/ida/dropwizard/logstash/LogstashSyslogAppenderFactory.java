@@ -24,7 +24,7 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 
 @JsonTypeName("logstash-syslog")
-public class LogstashSyslogAppenderFactory extends AbstractAppenderFactory {
+public class LogstashSyslogAppenderFactory extends AbstractAppenderFactory<ILoggingEvent> {
 
     @NotNull
     @JsonProperty
@@ -47,9 +47,9 @@ public class LogstashSyslogAppenderFactory extends AbstractAppenderFactory {
     public Appender<ILoggingEvent> build(
             LoggerContext context,
             String applicationName,
-            LayoutFactory layout,
-            LevelFilterFactory levelFilterFactory,
-            AsyncAppenderFactory asyncAppenderFactory) {
+            LayoutFactory<ILoggingEvent> layout,
+            LevelFilterFactory<ILoggingEvent> levelFilterFactory,
+            AsyncAppenderFactory<ILoggingEvent> asyncAppenderFactory) {
 
         String hostname = getLocalHostname();
         LogstashLayout logstashLayout = createLogstashLayout(context);

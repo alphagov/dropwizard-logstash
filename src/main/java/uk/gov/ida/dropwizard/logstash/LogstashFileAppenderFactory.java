@@ -14,13 +14,13 @@ import io.dropwizard.logging.layout.LayoutFactory;
 import net.logstash.logback.encoder.LogstashEncoder;
 
 @JsonTypeName("logstash-file")
-public class LogstashFileAppenderFactory extends FileAppenderFactory {
+public class LogstashFileAppenderFactory extends FileAppenderFactory<ILoggingEvent> {
     @Override
     public Appender<ILoggingEvent> build(LoggerContext context,
                                          String applicationName,
-                                         LayoutFactory layout,
-                                         LevelFilterFactory levelFilterFactory,
-                                         AsyncAppenderFactory asyncAppenderFactory) {
+                                         LayoutFactory<ILoggingEvent> layout,
+                                         LevelFilterFactory<ILoggingEvent> levelFilterFactory,
+                                         AsyncAppenderFactory<ILoggingEvent> asyncAppenderFactory) {
         Encoder<ILoggingEvent> encoder = new LogstashEncoder();
         encoder.setContext(context);
         encoder.start();
