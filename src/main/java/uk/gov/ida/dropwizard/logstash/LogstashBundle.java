@@ -8,6 +8,7 @@ public class LogstashBundle implements Bundle {
     @Override
     public void initialize(Bootstrap<?> bootstrap) {
         bootstrap.getObjectMapper().getSubtypeResolver().registerSubtypes(
+                AccessLogstashConsoleAppenderFactory.class,
                 LogstashConsoleAppenderFactory.class,
                 LogstashSyslogAppenderFactory.class,
                 LogstashFileAppenderFactory.class
