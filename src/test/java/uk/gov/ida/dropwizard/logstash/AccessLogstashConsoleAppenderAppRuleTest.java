@@ -6,6 +6,9 @@ import io.dropwizard.testing.junit.DropwizardAppRule;
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.SystemOutRule;
+import org.junit.rules.RuleChain;
+import org.junit.rules.TestRule;
 import uk.gov.ida.dropwizard.logstash.support.AccessEventFormat;
 import uk.gov.ida.dropwizard.logstash.support.TestApplication;
 import uk.gov.ida.dropwizard.logstash.support.TestConfiguration;
@@ -24,15 +27,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class AccessLogstashConsoleAppenderAppRuleTest {
 
-    private static ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-
-    // this is executed before the @ClassRule
-    static {
-        System.setOut(new PrintStream(byteArrayOutputStream));
-    }
+    public static DropwizardAppRule<TestConfiguration> dropwizardAppRule = new DropwizardAppRule<>(TestApplication.class, ResourceHelpers.resourceFilePath("access-console-appender-test-application.yml"));
+    public static SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
 
     @ClassRule
-    public static DropwizardAppRule<TestConfiguration> dropwizardAppRule = new DropwizardAppRule<>(TestApplication.class, ResourceHelpers.resourceFilePath("access-console-appender-test-application.yml"));
+    public static TestRule ruleChain = RuleChain
+            .outerRule(systemOutRule)
+            .around(dropwizardAppRule);
 
     @Test
     public void testLoggingLogstashRequestLog() throws InterruptedException, IOException {
@@ -58,7 +59,7 @@ public class AccessLogstashConsoleAppenderAppRuleTest {
     private List<AccessEventFormat> parseLog() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         List<AccessEventFormat> list = new ArrayList<>();
-        StringTokenizer stringTokenizer = new StringTokenizer(byteArrayOutputStream.toString(), System.lineSeparator());
+        StringTokenizer stringTokenizer = new StringTokenizer(systemOutRule.getLog(), System.lineSeparator());
         while(stringTokenizer.hasMoreTokens()) {
             list.add(objectMapper.readValue(stringTokenizer.nextToken(), AccessEventFormat.class));
         }
