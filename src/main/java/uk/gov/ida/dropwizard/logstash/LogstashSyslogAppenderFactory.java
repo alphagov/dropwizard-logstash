@@ -9,7 +9,6 @@ import ch.qos.logback.core.net.SyslogConstants;
 import ch.qos.logback.core.net.SyslogOutputStream;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.google.common.base.Throwables;
 import io.dropwizard.logging.AbstractAppenderFactory;
 import io.dropwizard.logging.SyslogAppenderFactory;
 import io.dropwizard.logging.async.AsyncAppenderFactory;
@@ -85,7 +84,7 @@ public class LogstashSyslogAppenderFactory extends AbstractAppenderFactory {
         try {
             return new SyslogOutputStream(host, port);
         } catch (UnknownHostException | SocketException e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -94,7 +93,7 @@ public class LogstashSyslogAppenderFactory extends AbstractAppenderFactory {
             InetAddress localHost = InetAddress.getLocalHost();
             return localHost.getHostName();
         } catch (UnknownHostException e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 }

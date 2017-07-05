@@ -1,6 +1,5 @@
 package uk.gov.ida.dropwizard.logstash.support;
 
-import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 
 import java.io.IOException;
@@ -28,7 +27,7 @@ public class UdpServer {
         try {
             serverSocket = new DatagramSocket(new InetSocketAddress("localhost", 0));
         } catch (SocketException e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
 
         thread = new Thread(new Runnable() {
