@@ -2,7 +2,7 @@ package uk.gov.ida.dropwizard.logstash.support;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class LogFormat {
+public class LoggingEventFormat {
 
     @JsonProperty("@timestamp")
     public String timestamp;
@@ -22,11 +22,11 @@ public class LogFormat {
 
     public String tags;
 
-    private LogFormat() {
+    private LoggingEventFormat() {
 
     }
 
-    public LogFormat(String timestamp, String version, String message, String logger_name, String thread_name, String level, String level_value, String tags) {
+    public LoggingEventFormat(String timestamp, String version, String message, String logger_name, String thread_name, String level, String level_value, String tags) {
         this.timestamp = timestamp;
         this.version = version;
         this.message = message;

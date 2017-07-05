@@ -6,7 +6,7 @@ import io.dropwizard.testing.junit.DropwizardAppRule;
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.junit.ClassRule;
 import org.junit.Test;
-import uk.gov.ida.dropwizard.logstash.support.LoggingEventFormat;
+import uk.gov.ida.dropwizard.logstash.support.AccessEventFormat;
 import uk.gov.ida.dropwizard.logstash.support.TestApplication;
 import uk.gov.ida.dropwizard.logstash.support.TestConfiguration;
 
@@ -19,9 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class LogstashConsoleAppenderAppRuleTest {
+public class AccessLogstashConsoleAppenderAppRuleTest {
 
     private static ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
@@ -31,7 +32,7 @@ public class LogstashConsoleAppenderAppRuleTest {
     }
 
     @ClassRule
-    public static DropwizardAppRule<TestConfiguration> dropwizardAppRule = new DropwizardAppRule<>(TestApplication.class, ResourceHelpers.resourceFilePath("console-appender-test-application.yml"));
+    public static DropwizardAppRule<TestConfiguration> dropwizardAppRule = new DropwizardAppRule<>(TestApplication.class, ResourceHelpers.resourceFilePath("access-console-appender-test-application.yml"));
 
     @Test
     public void testLoggingLogstashRequestLog() throws InterruptedException, IOException {
@@ -41,30 +42,25 @@ public class LogstashConsoleAppenderAppRuleTest {
 
         assertThat(response.readEntity(String.class)).isEqualTo("hello!");
 
-        final List<LoggingEventFormat> list = parseLog();
+        final List<AccessEventFormat> list = parseLog();
 
-        assertThat(list.stream().filter(logLine -> logLine.getLoggerName().equals("http.request")).count()).isEqualTo(1);
-
+        List<AccessEventFormat> accessEventStream = list.stream().filter(accessLog -> accessLog.getMethod().equals("GET")).collect(toList());
+        assertThat(accessEventStream.size()).isEqualTo(1);
+        AccessEventFormat accessEvent = accessEventStream.get(0);
+        assertThat(accessEvent.getMethod()).isEqualTo("GET");
+        assertThat(accessEvent.getContentLength()).isEqualTo(6);
+        assertThat(accessEvent.getRequestedUri()).isEqualTo("/");
+        assertThat(accessEvent.getProtocol()).isEqualTo("HTTP/1.1");
+        assertThat(accessEvent.getStatusCode()).isEqualTo(200);
+        assertThat(accessEvent.getVersion()).isEqualTo(1);
     }
 
-    @Test
-    public void testLoggingLogstashFileLog() throws IOException {
-
-        final List<LoggingEventFormat> list = parseLog();
-
-        assertThat(list.size()).isGreaterThan(0);
-
-        assertThat(list.stream()
-                .filter(logFormat -> logFormat.getMessage().equals("The following paths were found for the configured resources:\n\n    GET     / (uk.gov.ida.dropwizard.logstash.support.RootResource)\n"))
-                .count()).isEqualTo(1);
-    }
-
-    private List<LoggingEventFormat> parseLog() throws IOException {
+    private List<AccessEventFormat> parseLog() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        List<LoggingEventFormat> list = new ArrayList<>();
+        List<AccessEventFormat> list = new ArrayList<>();
         StringTokenizer stringTokenizer = new StringTokenizer(byteArrayOutputStream.toString(), System.lineSeparator());
         while(stringTokenizer.hasMoreTokens()) {
-            list.add(objectMapper.readValue(stringTokenizer.nextToken(), LoggingEventFormat.class));
+            list.add(objectMapper.readValue(stringTokenizer.nextToken(), AccessEventFormat.class));
         }
         return list;
     }

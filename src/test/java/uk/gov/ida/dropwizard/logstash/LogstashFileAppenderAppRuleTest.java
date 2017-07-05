@@ -6,10 +6,9 @@ import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit.DropwizardAppRule;
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
-import uk.gov.ida.dropwizard.logstash.support.LogFormat;
+import uk.gov.ida.dropwizard.logstash.support.LoggingEventFormat;
 import uk.gov.ida.dropwizard.logstash.support.TestApplication;
 import uk.gov.ida.dropwizard.logstash.support.TestConfiguration;
 
@@ -41,7 +40,7 @@ public class LogstashFileAppenderAppRuleTest {
     }
 
     @ClassRule
-    public static DropwizardAppRule<TestConfiguration> dropwizardAppRule = new DropwizardAppRule(TestApplication.class, ResourceHelpers
+    public static DropwizardAppRule<TestConfiguration> dropwizardAppRule = new DropwizardAppRule<>(TestApplication.class, ResourceHelpers
             .resourceFilePath("file-appender-test-application.yml"),
             ConfigOverride.config("server.requestLog.appenders[0].currentLogFilename", requestLog.getAbsolutePath()),
             ConfigOverride.config("logging.appenders[0].currentLogFilename", logLog.getAbsolutePath())
@@ -70,7 +69,7 @@ public class LogstashFileAppenderAppRuleTest {
 
         assertThat(requestLog.length()).isGreaterThan(0);
 
-        final List<LogFormat> list = parseLog(requestLog);
+        final List<LoggingEventFormat> list = parseLog(requestLog);
 
         assertThat(list.size()).isEqualTo(1);
 
@@ -85,7 +84,7 @@ public class LogstashFileAppenderAppRuleTest {
 
         assertThat(logLog.length()).isGreaterThan(0);
 
-        final List<LogFormat> list = parseLog(logLog);
+        final List<LoggingEventFormat> list = parseLog(logLog);
 
         assertThat(list.size()).isGreaterThan(0);
 
@@ -94,12 +93,12 @@ public class LogstashFileAppenderAppRuleTest {
                 .count()).isEqualTo(1);
     }
 
-    private List<LogFormat> parseLog(File logLog) throws IOException {
+    private List<LoggingEventFormat> parseLog(File logLog) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         return Files.readAllLines(logLog.toPath()).stream()
                 .map(line -> {
                     try {
-                        return objectMapper.readValue(line, LogFormat.class);
+                        return objectMapper.readValue(line, LoggingEventFormat.class);
                     } catch (IOException e) {
                         return null;
                     }

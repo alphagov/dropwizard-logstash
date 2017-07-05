@@ -46,7 +46,7 @@ public class AccessLogstashConsoleAppenderFactory extends ConsoleAppenderFactory
         encoder.start();
 
         final ConsoleAppender<IAccessEvent> appender = new ConsoleAppender<>();
-        appender.setName("logstash-console-appender");
+        appender.setName("access-logstash-console-appender");
         appender.setContext(context);
         appender.setTarget(getTarget().get());
         appender.setEncoder(encoder);
