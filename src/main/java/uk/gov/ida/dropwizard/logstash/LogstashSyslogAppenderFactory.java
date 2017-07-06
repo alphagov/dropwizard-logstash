@@ -9,7 +9,6 @@ import ch.qos.logback.core.net.SyslogConstants;
 import ch.qos.logback.core.net.SyslogOutputStream;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.google.common.base.Throwables;
 import io.dropwizard.logging.AbstractAppenderFactory;
 import io.dropwizard.logging.SyslogAppenderFactory;
 import io.dropwizard.logging.async.AsyncAppenderFactory;
@@ -25,7 +24,7 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 
 @JsonTypeName("logstash-syslog")
-public class LogstashSyslogAppenderFactory extends AbstractAppenderFactory {
+public class LogstashSyslogAppenderFactory extends AbstractAppenderFactory<ILoggingEvent> {
 
     @NotNull
     @JsonProperty
@@ -48,9 +47,9 @@ public class LogstashSyslogAppenderFactory extends AbstractAppenderFactory {
     public Appender<ILoggingEvent> build(
             LoggerContext context,
             String applicationName,
-            LayoutFactory layout,
-            LevelFilterFactory levelFilterFactory,
-            AsyncAppenderFactory asyncAppenderFactory) {
+            LayoutFactory<ILoggingEvent> layout,
+            LevelFilterFactory<ILoggingEvent> levelFilterFactory,
+            AsyncAppenderFactory<ILoggingEvent> asyncAppenderFactory) {
 
         String hostname = getLocalHostname();
         LogstashLayout logstashLayout = createLogstashLayout(context);
@@ -85,7 +84,7 @@ public class LogstashSyslogAppenderFactory extends AbstractAppenderFactory {
         try {
             return new SyslogOutputStream(host, port);
         } catch (UnknownHostException | SocketException e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -94,7 +93,7 @@ public class LogstashSyslogAppenderFactory extends AbstractAppenderFactory {
             InetAddress localHost = InetAddress.getLocalHost();
             return localHost.getHostName();
         } catch (UnknownHostException e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 }

@@ -14,14 +14,14 @@ import io.dropwizard.logging.layout.LayoutFactory;
 import net.logstash.logback.encoder.LogstashEncoder;
 
 @JsonTypeName("logstash-console")
-public class LogstashConsoleAppenderFactory extends ConsoleAppenderFactory {
+public class LogstashConsoleAppenderFactory extends ConsoleAppenderFactory<ILoggingEvent> {
 
     @Override
     public Appender<ILoggingEvent> build(LoggerContext context,
                                          String applicationName,
-                                         LayoutFactory layout,
-                                         LevelFilterFactory levelFilterFactory,
-                                         AsyncAppenderFactory asyncAppenderFactory) {
+                                         LayoutFactory<ILoggingEvent> layout,
+                                         LevelFilterFactory<ILoggingEvent> levelFilterFactory,
+                                         AsyncAppenderFactory<ILoggingEvent> asyncAppenderFactory) {
 
         Encoder<ILoggingEvent> encoder = new LogstashEncoder();
         encoder.setContext(context);

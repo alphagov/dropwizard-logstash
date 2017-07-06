@@ -3,9 +3,8 @@ server:
     - type: http
       port: 0
   requestLog:
-    type: classic
     appenders:
-      - type: logstash-console
+      - type: access-logstash-console
 
 logging:
     appenders:
