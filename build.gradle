@@ -10,7 +10,7 @@ repositories {
 }
 
 def dependencyVersions = [
-        dropwizard: '1.1.0'
+        dropwizard: '1.1.2'
 ]
 
 dependencies {
