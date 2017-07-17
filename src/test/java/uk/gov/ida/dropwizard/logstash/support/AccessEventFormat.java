@@ -3,6 +3,12 @@ package uk.gov.ida.dropwizard.logstash.support;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class AccessEventFormat {
+    public static class Bytes {
+        public int bytes;
+    }
+    public static class Milliseconds {
+        public int ms;
+    }
 
     @JsonProperty("@timestamp")
     public String timestamp;
@@ -10,16 +16,20 @@ public class AccessEventFormat {
     @JsonProperty("@version")
     public int version;
 
-    public int content_length;
-    public int elapsed_time;
-    public String hostname;
-    public String method;
-    public String protocol;
-    public String remote_host;
-    public String remote_user;
-    public String requested_uri;
-    public int status_code;
     public String message;
+
+    public AccessData access;
+
+    public static class AccessData {
+        public Bytes body_sent;
+        public Milliseconds elapsed_time;
+        public String method;
+        public String http_version;
+        public String remote_ip;
+        public String user_name;
+        public int response_code;
+        public String url;
+    }
 
     private AccessEventFormat() {
 
@@ -38,40 +48,36 @@ public class AccessEventFormat {
         return version;
     }
 
-    public int getContentLength() {
-        return content_length;
+    public int getBytesSent() {
+        return access.body_sent.bytes;
     }
 
-    public int getElapsedTime() {
-        return elapsed_time;
-    }
-
-    public String getHostname() {
-        return hostname;
+    public int getElapsedTimeMillis() {
+        return access.elapsed_time.ms;
     }
 
     public String getMethod() {
-        return method;
+        return access.method;
     }
 
-    public String getProtocol() {
-        return protocol;
+    public String getHttpVersion() {
+        return access.http_version;
     }
 
-    public String getRemoteHost() {
-        return remote_host;
+    public String getRemoteIp() {
+        return access.remote_ip;
     }
 
-    public String getRemoteUser() {
-        return remote_user;
+    public String getUserName() {
+        return access.user_name;
     }
 
-    public String getRequestedUri() {
-        return requested_uri;
+    public int getResponseCode() {
+        return access.response_code;
     }
 
-    public int getStatusCode() {
-        return status_code;
+    public String getUrl() {
+        return access.url;
     }
 
     public String getMessage() {

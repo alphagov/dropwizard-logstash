@@ -39,7 +39,7 @@ public class LogstashConsoleAppenderAppRuleTest {
     public void testLoggingLogstashRequestLog() throws InterruptedException, IOException {
         Client client = new JerseyClientBuilder().build();
 
-        final Response response = client.target("http://localhost:" + dropwizardAppRule.getLocalPort() + "/").request().get();
+        final Response response = client.target("http://localhost:" + dropwizardAppRule.getLocalPort() + "/?queryparam=test").request().get();
 
         assertThat(response.readEntity(String.class)).isEqualTo("hello!");
 
@@ -49,11 +49,15 @@ public class LogstashConsoleAppenderAppRuleTest {
         assertThat(accessEventStream.size()).isEqualTo(1);
         AccessEventFormat accessEvent = accessEventStream.get(0);
         assertThat(accessEvent.getMethod()).isEqualTo("GET");
-        assertThat(accessEvent.getContentLength()).isEqualTo("hello!".length());
-        assertThat(accessEvent.getRequestedUri()).isEqualTo("/");
-        assertThat(accessEvent.getProtocol()).isEqualTo("HTTP/1.1");
-        assertThat(accessEvent.getStatusCode()).isEqualTo(200);
+        assertThat(accessEvent.getBytesSent()).isEqualTo("hello!".length());
+        assertThat(accessEvent.getUrl()).isEqualTo("/?queryparam=test");
+        assertThat(accessEvent.getHttpVersion()).isEqualTo("1.1");
+        assertThat(accessEvent.getResponseCode()).isEqualTo(200);
+        assertThat(accessEvent.getRemoteIp()).isEqualTo("127.0.0.1");
         assertThat(accessEvent.getVersion()).isEqualTo(1);
+        // ballpark check that the unit is in the right order of magnitude
+        // this test should hopefully catch a value that's erroneously measured in seconds
+        assertThat(accessEvent.getElapsedTimeMillis()).isBetween(3,3000);
     }
 
     @Test
