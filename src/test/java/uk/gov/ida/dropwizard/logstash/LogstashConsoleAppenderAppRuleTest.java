@@ -46,7 +46,7 @@ public class LogstashConsoleAppenderAppRuleTest {
         final List<AccessEventFormat> list = parseLogsOfType(AccessEventFormat.class);
 
         List<AccessEventFormat> accessEventStream = list.stream().filter(accessLog -> accessLog.getMethod().equals("GET")).collect(toList());
-        assertThat(accessEventStream.size()).isEqualTo(1);
+        assertThat(accessEventStream.size()).as("check there's an access log in the following:\n%s", systemOutRule.getLog()).isEqualTo(1);
         AccessEventFormat accessEvent = accessEventStream.get(0);
         assertThat(accessEvent.getMethod()).isEqualTo("GET");
         assertThat(accessEvent.getBytesSent()).isEqualTo("hello!".length());
