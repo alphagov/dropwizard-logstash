@@ -43,6 +43,8 @@ public class LogstashConsoleAppenderAppRuleTest {
 
         assertThat(response.readEntity(String.class)).isEqualTo("hello!");
 
+        System.out.flush();
+
         final List<AccessEventFormat> list = parseLogsOfType(AccessEventFormat.class);
 
         List<AccessEventFormat> accessEventStream = list.stream().filter(accessLog -> accessLog.getMethod().equals("GET")).collect(toList());
