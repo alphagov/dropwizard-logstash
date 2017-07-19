@@ -43,7 +43,11 @@ public class LogstashConsoleAppenderAppRuleTest {
 
         assertThat(response.readEntity(String.class)).isEqualTo("hello!");
 
-        System.out.flush();
+        // If we try to read systemOutRule too quickly, under some circumstances the appender won't have
+        // successfully written the expected access log line yet.  We haven't got to the bottom of this
+        // but it seems to depend on whether another DropwizardAppRule test has been run before this one.
+        // sleeping for a while fixes the problem
+        Thread.sleep(500);
 
         final List<AccessEventFormat> list = parseLogsOfType(AccessEventFormat.class);
 
