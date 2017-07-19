@@ -39,21 +39,31 @@ public class LogstashConsoleAppenderAppRuleTest {
     public void testLoggingLogstashRequestLog() throws InterruptedException, IOException {
         Client client = new JerseyClientBuilder().build();
 
-        final Response response = client.target("http://localhost:" + dropwizardAppRule.getLocalPort() + "/").request().get();
+        final Response response = client.target("http://localhost:" + dropwizardAppRule.getLocalPort() + "/?queryparam=test").request().get();
 
         assertThat(response.readEntity(String.class)).isEqualTo("hello!");
+
+        // If we try to read systemOutRule too quickly, under some circumstances the appender won't have
+        // successfully written the expected access log line yet.  We haven't got to the bottom of this
+        // but it seems to depend on whether another DropwizardAppRule test has been run before this one.
+        // sleeping for a while fixes the problem
+        Thread.sleep(500);
 
         final List<AccessEventFormat> list = parseLogsOfType(AccessEventFormat.class);
 
         List<AccessEventFormat> accessEventStream = list.stream().filter(accessLog -> accessLog.getMethod().equals("GET")).collect(toList());
-        assertThat(accessEventStream.size()).isEqualTo(1);
+        assertThat(accessEventStream.size()).as("check there's an access log in the following:\n%s", systemOutRule.getLog()).isEqualTo(1);
         AccessEventFormat accessEvent = accessEventStream.get(0);
         assertThat(accessEvent.getMethod()).isEqualTo("GET");
-        assertThat(accessEvent.getContentLength()).isEqualTo("hello!".length());
-        assertThat(accessEvent.getRequestedUri()).isEqualTo("/");
-        assertThat(accessEvent.getProtocol()).isEqualTo("HTTP/1.1");
-        assertThat(accessEvent.getStatusCode()).isEqualTo(200);
+        assertThat(accessEvent.getBytesSent()).isEqualTo("hello!".length());
+        assertThat(accessEvent.getUrl()).isEqualTo("/?queryparam=test");
+        assertThat(accessEvent.getHttpVersion()).isEqualTo("1.1");
+        assertThat(accessEvent.getResponseCode()).isEqualTo(200);
+        assertThat(accessEvent.getRemoteIp()).isEqualTo("127.0.0.1");
         assertThat(accessEvent.getVersion()).isEqualTo(1);
+        // ballpark check that the unit is in the right order of magnitude
+        // this test should hopefully catch a value that's erroneously measured in seconds
+        assertThat(accessEvent.getElapsedTimeMillis()).isBetween(3,3000);
     }
 
     @Test
