@@ -58,6 +58,7 @@ public class LogstashConsoleAppenderAppRuleTest {
         assertThat(accessEvent.getMethod()).isEqualTo("GET");
         assertThat(accessEvent.getReferer()).isEqualTo("http://foobar/");
         assertThat(accessEvent.getUserAgent()).isEqualTo("lynx/1.337");
+        assertThat(accessEvent.getHost()).startsWith("localhost");
         assertThat(accessEvent.getBytesSent()).isEqualTo("hello!".length());
         assertThat(accessEvent.getUrl()).isEqualTo("/?queryparam=test");
         assertThat(accessEvent.getHttpVersion()).isEqualTo("1.1");

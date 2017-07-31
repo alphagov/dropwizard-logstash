@@ -31,6 +31,7 @@ public class AccessEventFormat {
         public String url;
         public String referrer;
         public String agent;
+        public String host;
     }
 
     private AccessEventFormat() {
@@ -60,6 +61,10 @@ public class AccessEventFormat {
 
     public String getUserAgent() {
         return access.agent;
+    }
+
+    public String getHost() {
+        return access.host;
     }
 
     public int getElapsedTimeMillis() {
