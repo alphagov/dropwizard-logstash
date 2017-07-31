@@ -39,7 +39,8 @@ public class LogstashConsoleAppenderAppRuleTest {
     public void testLoggingLogstashRequestLog() throws InterruptedException, IOException {
         Client client = new JerseyClientBuilder().build();
 
-        final Response response = client.target("http://localhost:" + dropwizardAppRule.getLocalPort() + "/?queryparam=test").request().get();
+        final Response response = client.target("http://localhost:" + dropwizardAppRule.getLocalPort() + "/?queryparam=test").request()
+                .header("Referer", "http://foobar/").get();
 
         assertThat(response.readEntity(String.class)).isEqualTo("hello!");
 
@@ -55,6 +56,7 @@ public class LogstashConsoleAppenderAppRuleTest {
         assertThat(accessEventStream.size()).as("check there's an access log in the following:\n%s", systemOutRule.getLog()).isEqualTo(1);
         AccessEventFormat accessEvent = accessEventStream.get(0);
         assertThat(accessEvent.getMethod()).isEqualTo("GET");
+        assertThat(accessEvent.getReferer()).isEqualTo("http://foobar/");
         assertThat(accessEvent.getBytesSent()).isEqualTo("hello!".length());
         assertThat(accessEvent.getUrl()).isEqualTo("/?queryparam=test");
         assertThat(accessEvent.getHttpVersion()).isEqualTo("1.1");

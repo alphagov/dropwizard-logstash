@@ -29,6 +29,7 @@ public class AccessEventFormat {
         public String user_name;
         public int response_code;
         public String url;
+        public String referrer;
     }
 
     private AccessEventFormat() {
@@ -50,6 +51,10 @@ public class AccessEventFormat {
 
     public int getBytesSent() {
         return access.body_sent.bytes;
+    }
+
+    public String getReferer() {
+        return access.referrer;
     }
 
     public int getElapsedTimeMillis() {

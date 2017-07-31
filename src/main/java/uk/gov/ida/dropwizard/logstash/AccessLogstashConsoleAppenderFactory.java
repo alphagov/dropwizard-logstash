@@ -78,6 +78,7 @@ public class AccessLogstashConsoleAppenderFactory extends ConsoleAppenderFactory
             JsonProviders<IAccessEvent> accessProviders = access.getProviders();
             accessProviders.addProvider(new MethodJsonProvider() {{setFieldName("method");}});
             accessProviders.addProvider(new HttpVersionJsonProvider());
+            accessProviders.addProvider(new RefererJsonProvider());
             accessProviders.addProvider(new StatusCodeJsonProvider() {{setFieldName("response_code");}});
             accessProviders.addProvider(new UrlJsonProvider());
             accessProviders.addProvider(new RemoteIpJsonProvider());
@@ -133,6 +134,13 @@ public class AccessLogstashConsoleAppenderFactory extends ConsoleAppenderFactory
         @Override
         public void writeTo(JsonGenerator generator, IAccessEvent event) throws IOException {
             generator.writeStringField("remote_ip", event.getRemoteAddr());
+        }
+    }
+
+    public static class RefererJsonProvider extends AbstractJsonProvider<IAccessEvent> {
+        @Override
+        public void writeTo(JsonGenerator generator, IAccessEvent event) throws IOException {
+            generator.writeStringField("referrer", event.getRequestHeader("Referer"));
         }
     }
 }
