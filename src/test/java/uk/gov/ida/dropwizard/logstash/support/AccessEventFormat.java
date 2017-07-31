@@ -30,6 +30,7 @@ public class AccessEventFormat {
         public int response_code;
         public String url;
         public String referrer;
+        public String agent;
     }
 
     private AccessEventFormat() {
@@ -55,6 +56,10 @@ public class AccessEventFormat {
 
     public String getReferer() {
         return access.referrer;
+    }
+
+    public String getUserAgent() {
+        return access.agent;
     }
 
     public int getElapsedTimeMillis() {

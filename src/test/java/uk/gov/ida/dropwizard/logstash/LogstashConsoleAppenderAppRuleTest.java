@@ -40,7 +40,7 @@ public class LogstashConsoleAppenderAppRuleTest {
         Client client = new JerseyClientBuilder().build();
 
         final Response response = client.target("http://localhost:" + dropwizardAppRule.getLocalPort() + "/?queryparam=test").request()
-                .header("Referer", "http://foobar/").get();
+                .header("Referer", "http://foobar/").header("User-Agent","lynx/1.337").get();
 
         assertThat(response.readEntity(String.class)).isEqualTo("hello!");
 
@@ -57,6 +57,7 @@ public class LogstashConsoleAppenderAppRuleTest {
         AccessEventFormat accessEvent = accessEventStream.get(0);
         assertThat(accessEvent.getMethod()).isEqualTo("GET");
         assertThat(accessEvent.getReferer()).isEqualTo("http://foobar/");
+        assertThat(accessEvent.getUserAgent()).isEqualTo("lynx/1.337");
         assertThat(accessEvent.getBytesSent()).isEqualTo("hello!".length());
         assertThat(accessEvent.getUrl()).isEqualTo("/?queryparam=test");
         assertThat(accessEvent.getHttpVersion()).isEqualTo("1.1");
