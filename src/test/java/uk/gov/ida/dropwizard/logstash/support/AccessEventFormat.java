@@ -29,6 +29,9 @@ public class AccessEventFormat {
         public String user_name;
         public int response_code;
         public String url;
+        public String referrer;
+        public String agent;
+        public String host;
     }
 
     private AccessEventFormat() {
@@ -50,6 +53,18 @@ public class AccessEventFormat {
 
     public int getBytesSent() {
         return access.body_sent.bytes;
+    }
+
+    public String getReferer() {
+        return access.referrer;
+    }
+
+    public String getUserAgent() {
+        return access.agent;
+    }
+
+    public String getHost() {
+        return access.host;
     }
 
     public int getElapsedTimeMillis() {
