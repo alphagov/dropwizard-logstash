@@ -6,7 +6,9 @@ apply plugin: 'idea'
 apply plugin: 'maven-publish'
 
 repositories {
-    mavenCentral()
+    maven {
+        url "https://artifactory.ida.digital.cabinet-office.gov.uk/artifactory/whitelisted-repos"
+    }
 }
 
 def dependencyVersions = [
