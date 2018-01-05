@@ -1,0 +1,15 @@
+pipeline {
+    agent {
+        docker {
+            image 'govukverify/java8:latest'
+        }
+    }
+
+   stages {
+       stage('Build') {
+           steps {
+               sh './gradlew build'
+           }
+       }
+   }
+}
