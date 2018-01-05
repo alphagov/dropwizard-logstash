@@ -60,8 +60,10 @@ publishing {
     }
     repositories {
         maven {
-            username "${System.env.ARTIUSER}"
-            password "${System.env.ARTIPASSWORD}"
+            credentials {
+                username "${System.env.ARTIUSER}"
+                password "${System.env.ARTIPASSWORD}"
+            }
             url "https://artifactory.ida.digital.cabinet-office.gov.uk/artifactory/libs-release-local"
         }
     }
