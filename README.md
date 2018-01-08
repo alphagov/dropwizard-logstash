@@ -39,6 +39,21 @@ server:
 
 `./pre-commit.sh`
 
+### Recreating the Jenkins build environment with docker
+
+Treproduce exactly what the Jenkins build server does, with docker,
+use the commands below to build the package and run the tests inside it.
+This is useful for re-creating and debugging build failures.
+
+```bash
+docker run -it -v "$(pwd)":/app -w /app --rm govukverify/java8:latest clean build test
+```
+
+Connect to the container to poke around with 
+````bash
+docker run govukverify/java8:latest /bin/bash.
+````
+
 ## Licence
 
 [MIT License](LICENCE)
