@@ -1,9 +1,7 @@
 pipeline {
-    agent {
-        docker {
-            image 'govukverify/java8:latest'
-        }
-    }
+    // We don't need to set up a global build agent, as each stage below
+    // includes its own.
+    agent none
 
     environment {
         // The artifactory credentials for publishing.
@@ -13,6 +11,11 @@ pipeline {
 
    stages {
        stage('Build') {
+           agent {
+               docker {
+                   image 'govukverify/java8:latest'
+               }
+           }
            steps {
                sh './gradlew build'
            }
@@ -21,7 +24,7 @@ pipeline {
           when {
               branch 'master'
           }
-          agent none
+          agent any
           environment {
               // The credentials() helper is used to securely read from the
               // Jenkins credentials store. In the case of username/password
@@ -38,6 +41,11 @@ pipeline {
           }
       }
        stage('Publish') {
+           agent {
+               docker {
+                   image 'govukverify/java8:latest'
+               }
+           }
            when {
                branch 'master'
            }
