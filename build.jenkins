@@ -20,7 +20,6 @@ pipeline {
           when {
               branch 'master'
           }
-          agent any
           environment {
               // The credentials() helper is used to securely read from the
               // Jenkins credentials store. In the case of username/password
