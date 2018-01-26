@@ -3,14 +3,8 @@ pipeline {
     // includes its own.
     agent none
 
-    environment {
-        // The artifactory credentials for publishing.
-        ARTIUSER = "${env.ARTIFACTORYUSER}"
-        ARTIPASSWORD = "${env.ARTIFACTORYPASSWORD}"
-    }
-
-   stages {
-       stage('Build') {
+    stages {
+        stage('Build') {
            agent {
                docker {
                    image 'govukverify/java8:latest'
@@ -19,39 +13,44 @@ pipeline {
            steps {
                sh './gradlew build'
            }
-       }
-       stage('Tag') {
-          when {
-              branch 'master'
-          }
-          agent any
-          environment {
-              // The credentials() helper is used to securely read from the
-              // Jenkins credentials store. In the case of username/password
-              // pairs, it populates the specified env var with data in the
-              // form 'username:password' - and also creates two further env
-              // vars with '_USR' and '_PSW' appended to the base name (used
-              // in the first step below) - see
-              // https://jenkins.io/doc/pipeline/tour/environment/#credentials-in-the-environment
-              ACCESS_TOKEN=credentials('verify-ci-build-scan-2017-12-20')
-          }
-          steps {
-              sh 'git config credential.username ${ACCESS_TOKEN_USR} && git config credential.helper "!echo password=\${ACCESS_TOKEN_PSW}; echo"'
-              sh 'git tag -a build_${BUILD_NUMBER} -m "jenkins2 tag build_${BUILD_NUMBER}" && GIT_ASKPASS=true git push origin build_${BUILD_NUMBER}'
-          }
-      }
-       stage('Publish') {
-           agent {
-               docker {
-                   image 'govukverify/java8:latest'
-               }
-           }
+        }
+        stage('Tag') {
            when {
                branch 'master'
            }
-           steps {
-               sh './gradlew publish'
+           agent any
+           environment {
+               // The credentials() helper is used to securely read from the
+               // Jenkins credentials store. In the case of username/password
+               // pairs, it populates the specified env var with data in the
+               // form 'username:password' - and also creates two further env
+               // vars with '_USR' and '_PSW' appended to the base name (used
+               // in the first step below) - see
+               // https://jenkins.io/doc/pipeline/tour/environment/#credentials-in-the-environment
+               ACCESS_TOKEN=credentials('verify-ci-build-scan-2017-12-20')
            }
-       }
-   }
+           steps {
+               sh 'git config credential.username ${ACCESS_TOKEN_USR} && git config credential.helper "!echo password=\${ACCESS_TOKEN_PSW}; echo"'
+               sh 'git tag -a build_${BUILD_NUMBER} -m "jenkins2 tag build_${BUILD_NUMBER}" && GIT_ASKPASS=true git push origin build_${BUILD_NUMBER}'
+           }
+        }
+        stage('Publish') {
+            agent {
+                docker {
+                    image 'govukverify/java8:latest'
+                }
+            }
+            environment {
+                // The artifactory credentials for publishing.
+                ARTIUSER = "${env.ARTIFACTORYUSER}"
+                ARTIPASSWORD = "${env.ARTIFACTORYPASSWORD}"
+            }
+            when {
+                branch 'master'
+            }
+            steps {
+                sh './gradlew publish'
+            }
+        }
+    }
 }
