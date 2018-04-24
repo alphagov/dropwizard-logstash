@@ -1,5 +1,7 @@
 # dropwizard-logstash
 
+[![Build Status](https://travis-ci.org/alphagov/dropwizard-logstash.svg?branch=master)](https://travis-ci.org/alphagov/dropwizard-logstash)
+
 Dropwizard extension that supports logstash format with various appenders: `logstash-file`, `logstash-syslog`, `logstash-console`
 
 ## Using the library
