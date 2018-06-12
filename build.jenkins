@@ -44,6 +44,9 @@ pipeline {
                 // The artifactory credentials for publishing.
                 ARTIUSER = "${env.ARTIFACTORYUSER}"
                 ARTIPASSWORD = "${env.ARTIFACTORYPASSWORD}"
+                // Bintray credentials
+                BINTRAY_USER    = 'richardtowers'
+                BINTRAY_API_KEY = credentials('bintray-api-key')
             }
             when {
                 branch 'master'
