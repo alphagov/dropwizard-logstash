@@ -46,6 +46,7 @@ test {
 
 
 task sourceJar(type: Jar) {
+    classifier "sources"
     from sourceSets.main.allJava
 }
 
