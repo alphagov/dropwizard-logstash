@@ -5,7 +5,7 @@ cache:
   - $HOME/.gradle/wrapper
   - $HOME/.m2
 jdk:
-- oraclejdk8
+- openjdk8
 - openjdk11
 after_success:
 - test "$TRAVIS_PULL_REQUEST" == false && test -n "$TRAVIS_TAG" && BUILD_NUMBER=$TRAVIS_TAG
