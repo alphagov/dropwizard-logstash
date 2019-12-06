@@ -28,6 +28,54 @@ dependencies {
             "io.dropwizard:dropwizard-testing:$dependencyVersions.dropwizard"
 }
 
+sourceSets {
+    java9 {
+        if (JavaVersion.current() >= JavaVersion.VERSION_1_9) {
+            java {
+                srcDir 'src/main/java9'
+            }
+        }
+    }
+    java10 {
+        if (JavaVersion.current() >= JavaVersion.VERSION_1_10) {
+            java {
+                srcDir 'src/main/java10'
+            }
+        }
+    }
+    java11 {
+        if (JavaVersion.current() >= JavaVersion.VERSION_11) {
+            java {
+                srcDir 'src/main/java11'
+            }
+        }
+    }
+}
+
+compileJava {
+    if(JavaVersion.current() >= JavaVersion.VERSION_1_9) {
+        options.compilerArgs.addAll(['--release', '8'])
+    }
+}
+
+compileJava9Java {
+    if(JavaVersion.current() >= JavaVersion.VERSION_1_9) {
+        options.compilerArgs.addAll(['--release', '9'])
+    }
+}
+
+compileJava10Java {
+    if(JavaVersion.current() >= JavaVersion.VERSION_1_10) {
+        options.compilerArgs.addAll(['--release', '10'])
+    }
+}
+
+compileJava11Java {
+    if(JavaVersion.current() >= JavaVersion.VERSION_11) {
+        options.compilerArgs.addAll(['--release', '11'])
+    }
+}
+
 test {
     testLogging {
         events "skipped", "failed", "standardError"
@@ -50,6 +98,23 @@ test {
 task sourceJar(type: Jar) {
     archiveClassifier = "sources"
     from sourceSets.main.allJava
+}
+
+jar {
+    into('META-INF/versions/9') {
+        from sourceSets.java9.output
+    }
+    into('META-INF/versions/10') {
+        from sourceSets.java10.output
+    }
+    into('META-INF/versions/11') {
+        from sourceSets.java11.output
+    }
+    manifest {
+        if(JavaVersion.current() >= JavaVersion.VERSION_1_9) {
+            attributes.put("Multi-Release", "true")
+        }
+    }
 }
 
 publishing {
