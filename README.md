@@ -64,3 +64,4 @@ docker run govukverify/java8:latest /bin/bash.
 
 dropwizard-logstash-[dropwizard version]-[build number]
 
+a small change
