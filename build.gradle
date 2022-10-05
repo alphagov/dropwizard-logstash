@@ -12,7 +12,7 @@ repositories {
 }
 
 def dependencyVersions = [
-        dropwizard: '2.0.21'
+        dropwizard: '2.1.2'
 ]
 
 group 'uk.gov.ida'
