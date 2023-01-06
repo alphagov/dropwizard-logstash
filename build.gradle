@@ -34,7 +34,7 @@ dependencies {
             'org.mockito:mockito-core:3.2.0',
             'com.github.stefanbirkner:system-rules:1.16.1',
             "io.dropwizard:dropwizard-testing:$dependencyVersions.dropwizard",
-            'org.assertj:assertj-core:3.19.0'
+            'org.assertj:assertj-core:3.24.0'
 }
 
 sourceSets {
