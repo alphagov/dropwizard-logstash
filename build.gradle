@@ -27,7 +27,7 @@ dependencies {
     implementation "io.dropwizard:dropwizard-core:$dependencyVersions.dropwizard"
 
     api 'net.logstash.logback:logstash-logback-encoder:4.11',
-            'ch.qos.logback:logback-access:1.2.3'
+            'ch.qos.logback:logback-access:1.4.6'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.5.2',
             'org.hamcrest:hamcrest-library:2.2',
