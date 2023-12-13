@@ -1,6 +1,8 @@
 # dropwizard-logstash
 
-[![Build Status](https://travis-ci.org/alphagov/dropwizard-logstash.svg?branch=master)](https://travis-ci.org/alphagov/dropwizard-logstash)
+>**GOV.UK Verify has closed**
+>
+>This repository is out of date and has been archived
 
 Dropwizard extension that supports logstash format with various appenders: `logstash-file`, `logstash-syslog`, `logstash-console`
 
